@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# Environnements
+.env
+venv/
+.env.*
+
+# Data lourde
+data/
+*.las
+*.laz
+*.asc
+*.tif
+
+# PostgreSQL
+*.sql
+pgdata/
+postgres_data/
+
+# Docker
+*.log
+*.pid
+
+# Node
+node_modules/

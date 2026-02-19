@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte 2D - WebSIG Portfolio</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet Draw CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <!-- Leaflet MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
+
+    <style>
+        #map { height: calc(100vh - 56px); width: 100%; }
+        .sidebar { position: absolute; top: 70px; right: 20px; width: 380px; max-height: calc(100vh - 100px); z-index: 1000; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease-in-out; }
+        .sidebar.collapsed { transform: translateX(calc(100% + 20px)); }
+        .tools-panel { position: absolute; top: 70px; left: 20px; z-index: 1000; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 15px; max-height: calc(100vh - 100px); overflow-y: auto; transition: transform 0.3s ease-in-out; }
+        .tools-panel.collapsed { transform: translateX(calc(-100% - 20px)); }
+        .toggle-btn { position: absolute; width: 40px; height: 40px; background: white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1001; transition: all 0.3s; }
+        .toggle-btn:hover { background: #f8f9fa; transform: scale(1.1); }
+        .toggle-btn-left { top: 70px; left: 20px; }
+        .toggle-btn-right { top: 70px; right: 20px; }
+        .toggle-btn.hidden { display: none; }
+        .tool-button { margin-bottom: 10px; width: 100%; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .loading-overlay.active { display: flex; }
+        .loading-spinner { background: white; padding: 30px; border-radius: 10px; text-align: center; }
+        .progress-container { margin-top: 15px; display: none; }
+        .progress-container.active { display: block; }
+        .layer-item { background: #f8f9fa; border-radius: 6px; padding: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+        .layer-item:hover { background: #e9ecef; transform: translateX(2px); }
+        .layer-item.active { background: #e7f3ff; border-left: 3px solid #0d6efd; }
+        .stats-badge { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); z-index: 1000; background: white; padding: 8px 16px; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); font-size: 0.85rem; }
+        .drop-zone { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; margin: 10px 0; cursor: pointer; transition: all 0.3s; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: #0d6efd; background: #f8f9fa; }
+        .drop-zone i { font-size: 2rem; color: #6c757d; margin-bottom: 10px; }
+        .sidebar-content { max-height: calc(100vh - 120px); overflow-y: auto; padding: 15px; }
+        .panel-header { background: #f8f9fa; padding: 12px 15px; border-radius: 8px 8px 0 0; border-bottom: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center; }
+        .panel-close-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #6c757d; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s; }
+        .panel-close-btn:hover { background: #e9ecef; color: #000; }
+    </style>
+</head>
+
+<body>
+    <!-- ✅ NAVBAR COMPLÈTE -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html"><i class="fas fa-globe-americas me-2"></i>territoires</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-home"></i> Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="map.html"><i class="fas fa-map"></i> Carte 2D</a></li>
+                    <li class="nav-item"><a class="nav-link" href="3d-viewer.html"><i class="fas fa-cube"></i> Visualisation 3D</a></li>
+                    <li class="nav-item"><a class="nav-link" href="analysis.html"><i class="fas fa-chart-line"></i> Analyses</a></li>
+                    <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary mb-3" role="status"><span class="visually-hidden">Chargement...</span></div>
+            <h5 id="loading-text">Chargement des données...</h5>
+            <div class="progress-container" id="progress-container">
+                <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" id="progress-bar" style="width: 0%"></div></div>
+                <small class="text-muted mt-2 d-block" id="progress-text">0%</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-badge" id="stats-badge">
+        <i class="fas fa-layer-group me-2"></i><span id="stats-layers">0</span> couches •
+        <i class="fas fa-map-marker-alt me-1"></i><span id="stats-features">0</span> entités
+    </div>
+
+    <div class="toggle-btn toggle-btn-left" id="toggle-tools"><i class="fas fa-tools"></i></div>
+    <div class="toggle-btn toggle-btn-right" id="toggle-layers"><i class="fas fa-layer-group"></i></div>
+
+    <div class="tools-panel" id="tools-panel">
+        <div class="panel-header">
+            <h6 class="mb-0"><i class="fas fa-tools me-2"></i>Outils</h6>
+            <button class="panel-close-btn" id="close-tools"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="mt-3">
+            <h6 class="mb-3 text-muted small">DESSIN</h6>
+            <button class="btn btn-primary btn-sm tool-button" id="btn-draw-point"><i class="fas fa-map-pin me-2"></i>Point</button>
+            <button class="btn btn-primary btn-sm tool-button" id="btn-draw-line"><i class="fas fa-route me-2"></i>Ligne</button>
+            <button class="btn btn-primary btn-sm tool-button" id="btn-draw-polygon"><i class="fas fa-draw-polygon me-2"></i>Polygone</button>
+            <button class="btn btn-primary btn-sm tool-button" id="btn-draw-rectangle"><i class="fas fa-square me-2"></i>Rectangle</button>
+            <hr>
+            <h6 class="mb-3 text-muted small">ANALYSES</h6>
+            <button class="btn btn-success btn-sm tool-button" id="btn-buffer"><i class="fas fa-circle-notch me-2"></i>Buffer</button>
+            <button class="btn btn-info btn-sm tool-button" id="btn-measure"><i class="fas fa-ruler me-2"></i>Mesurer</button>
+            <button class="btn btn-warning btn-sm tool-button" id="btn-intersect"><i class="fas fa-project-diagram me-2"></i>Intersection</button>
+            <hr>
+            <h6 class="mb-3 text-muted small">IMPORT/EXPORT</h6>
+            <div class="drop-zone" id="drop-zone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p class="mb-0 mt-2"><small>Glissez des fichiers ici</small></p>
+                <p class="mb-0"><small class="text-muted">GeoJSON, CSV, KML, GPX (max 10 MB)</small></p>
+            </div>
+            <!-- ✅ SUPPORT: GeoJSON, JSON, CSV, KML, GPX -->
+            <input type="file" id="file-input" accept=".geojson,.json,.csv,.kml,.gpx" multiple hidden>
+            <button class="btn btn-secondary btn-sm tool-button mt-2" id="btn-export"><i class="fas fa-download me-2"></i>Exporter</button>
+            <hr>
+            <button class="btn btn-danger btn-sm tool-button" id="btn-clear"><i class="fas fa-trash me-2"></i>Tout effacer</button>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="panel-header">
+            <h5 class="mb-0"><i class="fas fa-layer-group me-2"></i>Gestionnaire</h5>
+            <button class="panel-close-btn" id="close-sidebar"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sidebar-content">
+            <div class="search-box">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="search-features" placeholder="Rechercher...">
+                </div>
+            </div>
+            <h6 class="mb-2">Fonds de carte</h6>
+            <div class="mb-2"><div class="form-check"><input class="form-check-input" type="radio" name="basemap" id="layer-osm" checked><label class="form-check-label" for="layer-osm"><i class="fas fa-map me-1"></i> OpenStreetMap</label></div></div>
+            <div class="mb-2"><div class="form-check"><input class="form-check-input" type="radio" name="basemap" id="layer-satellite"><label class="form-check-label" for="layer-satellite"><i class="fas fa-satellite me-1"></i> Satellite</label></div></div>
+            <div class="mb-3"><div class="form-check"><input class="form-check-input" type="radio" name="basemap" id="layer-topo"><label class="form-check-label" for="layer-topo"><i class="fas fa-mountain me-1"></i> Topographique</label></div></div>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Couches de données</h6>
+                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="toggle-clustering" checked><label class="form-check-label" for="toggle-clustering"><small>Cluster</small></label></div>
+            </div>
+            <div id="layers-list"><div class="text-muted text-center py-3"><small>Aucune couche chargée</small></div></div>
+            <hr>
+            <h6 class="mb-3">Entités <span class="badge bg-secondary" id="feature-count">0</span></h6>
+            <div id="features-list" class="list-group"><div class="text-muted text-center py-3"><small>Aucune entité</small></div></div>
+            <hr>
+            <div class="mb-0">
+                <h6 class="mb-2"><i class="fas fa-crosshairs me-2"></i>Coordonnées</h6>
+                <div class="row g-2">
+                    <div class="col-6"><div class="input-group input-group-sm"><span class="input-group-text">Lat</span><input type="text" class="form-control" id="mouse-lat" readonly></div></div>
+                    <div class="col-6"><div class="input-group input-group-sm"><span class="input-group-text">Lng</span><input type="text" class="form-control" id="mouse-lng" readonly></div></div>
+                </div>
+                <div class="mt-2"><div class="input-group input-group-sm"><span class="input-group-text">Zoom</span><input type="text" class="form-control" id="map-zoom" readonly></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <!-- ✅ PapaParse pour CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/map-2d.js"></script>
+</body>
+</html>

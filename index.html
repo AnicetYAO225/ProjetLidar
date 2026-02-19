@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSIG Portfolio - Analyses Géospatiales et LIDAR</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/custom.css">
+
+    <style>
+        .hero-section h1 {
+            letter-spacing: 1px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        footer {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="fas fa-globe-americas me-2"></i>
+                territoires
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="map.html">
+                            <i class="fas fa-map"></i> Carte 2D
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="3d-viewer.html">
+                            <i class="fas fa-cube"></i> Visualisation 3D
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="analysis.html">
+                            <i class="fas fa-chart-line"></i> Analyses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section avec image -->
+    <section class="hero-section text-white text-center d-flex align-items-center" style="
+        min-height: 75vh;
+        background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+        url('images/img.jpg') center/cover no-repeat;
+    ">
+
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">
+                Plateforme WebSIG d'analyse territoriale
+            </h1>
+
+            <p class="lead mb-4">
+                Visualisation cartographique, analyses spatiales et données 3D
+                pour l'exploration des territoires.
+            </p>
+
+            <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+                <a href="map.html" class="btn btn-light btn-lg px-4">
+                    <i class="fas fa-map me-2"></i>
+                    Ouvrir la carte
+                </a>
+
+                <a href="dashboard.html" class="btn btn-outline-light btn-lg px-4">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Voir les analyses
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FONCTIONNALITÉS -->
+    <section class="py-5 bg-light">
+        <div class="container">
+
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Fonctionnalités Principales</h2>
+                <p class="text-muted">
+                    Architecture géospatiale moderne pour l'analyse et la visualisation des territoires
+                </p>
+            </div>
+
+            <div class="row g-4">
+
+                <!-- Analyses -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card h-100 text-center p-4">
+                        <i class="fas fa-project-diagram fa-2x text-primary mb-3"></i>
+                        <h5 class="fw-bold">Analyses Spatiales</h5>
+                        <ul class="small text-muted list-unstyled">
+                            <li>• Buffer & intersection</li>
+                            <li>• Jointures spatiales</li>
+                            <li>• Calcul d’indicateurs</li>
+                            <li>• Requêtes SQL spatiales</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- LIDAR -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card h-100 text-center p-4">
+                        <i class="fas fa-wave-square fa-2x text-success mb-3"></i>
+                        <h5 class="fw-bold">Traitement LIDAR</h5>
+                        <ul class="small text-muted list-unstyled">
+                            <li>• Chargement LAS / LAZ</li>
+                            <li>• Classification</li>
+                            <li>• LOD dynamique</li>
+                            <li>• Profil altimétrique</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Modélisation -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card h-100 text-center p-4">
+                        <i class="fas fa-water fa-2x text-info mb-3"></i>
+                        <h5 class="fw-bold">Modélisations</h5>
+                        <ul class="small text-muted list-unstyled">
+                            <li>• Zones inondables</li>
+                            <li>• Analyse de visibilité</li>
+                            <li>• Ombrage solaire</li>
+                            <li>• MNT / MNS</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- PostGIS -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card h-100 text-center p-4">
+                        <i class="fas fa-database fa-2x text-warning mb-3"></i>
+                        <h5 class="fw-bold">PostGIS</h5>
+                        <ul class="small text-muted list-unstyled">
+                            <li>• Stockage spatial optimisé</li>
+                            <li>• Indexation GiST</li>
+                            <li>• API REST sécurisée</li>
+                            <li>• Performances élevées</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white py-3">
+        <div class="container text-center">
+
+            <p class="mb-2">
+                <i class="fas fa-code me-1"></i>
+                Développé par
+                <a href="https://www.linkedin.com/in/anicet-yao-g%C3%A9omaticien-sig-cdi-cartographe-data-analyst-data-scientist/"
+                    class="text-white text-decoration-underline">
+                    Anicet YAO
+                </a>
+            </p>
+
+            <div class="mb-2">
+                <a href="https://anicetyao225.github.io/porfolio/" class="text-white me-3">
+                    <i class="fab fa-github fa-lg"></i>
+                </a>
+
+                <a href="https://www.linkedin.com/in/anicet-yao-g%C3%A9omaticien-sig-cdi-cartographe-data-analyst-data-scientist/"
+                    class="text-white">
+                    <i class="fab fa-linkedin fa-lg"></i>
+                </a>
+            </div>
+
+            <p class="text-muted small mb-0">
+                © 2025 WebSIG Portfolio
+            </p>
+
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>

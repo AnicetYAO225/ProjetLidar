@@ -1,0 +1,16 @@
+/* Hero plus grand */
+.hero-section {
+    min-height: 85vh;   /* hauteur de la bannière */
+    display: flex;
+    align-items: center;
+}
+
+/* Footer compact */
+footer {
+    padding: 8px 0 !important;
+    font-size: 0.85rem;
+}
+
+footer i {
+    font-size: 1rem !important;
+}

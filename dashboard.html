@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Territoires</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    
+    <style>
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #212529;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .activity-item {
+            border-left: 3px solid #0d6efd;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-globe-americas me-2"></i>
+                territoires
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fas fa-home"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="map.html">
+                            <i class="fas fa-map"></i> Carte 2D
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="3d-viewer.html">
+                            <i class="fas fa-cube"></i> Visualisation 3D
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="analysis.html">
+                            <i class="fas fa-chart-line"></i> Analyses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <h1 class="mb-4">
+            <i class="fas fa-tachometer-alt text-primary me-2"></i>
+            Tableau de Bord
+        </h1>
+
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-value" id="stat-features">0</div>
+                    <div class="stat-label">Entités Spatiales</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="stat-value" id="stat-lidar">0</div>
+                    <div class="stat-label">Fichiers LIDAR</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value" id="stat-analyses">0</div>
+                    <div class="stat-label">Analyses Effectuées</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <div class="stat-value" id="stat-simulations">0</div>
+                    <div class="stat-label">Simulations</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Entités par Catégorie</h5>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Analyses par Type</h5>
+                    <canvas id="analysisChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity and System Status -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-2"></i>
+                            Activité Récente
+                        </h5>
+                    </div>
+                    <div class="card-body" id="recent-activity">
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                            <p>Chargement de l'activité...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-server me-2"></i>
+                            État du Système
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>API Backend</span>
+                                <span class="badge bg-success" id="api-status">
+                                    <i class="fas fa-circle me-1"></i>En ligne
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Base de Données</span>
+                                <span class="badge bg-success" id="db-status">
+                                    <i class="fas fa-circle me-1"></i>Connectée
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>PostGIS</span>
+                                <span class="badge bg-success" id="postgis-status">
+                                    <i class="fas fa-circle me-1"></i>Actif
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="small text-muted">
+                            <p class="mb-1">
+                                <strong>Version API:</strong> 1.0.0
+                            </p>
+                            <p class="mb-1">
+                                <strong>Dernière mise à jour:</strong> 
+                                <span id="last-update">--</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIDAR Statistics -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cloud me-2"></i>
+                            Statistiques LIDAR
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="lidar-stats-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fichier</th>
+                                        <th>Points</th>
+                                        <th>Altitude Min</th>
+                                        <th>Altitude Max</th>
+                                        <th>Date Upload</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            Chargement...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/api-client.js"></script>
+    <script>
+        let categoryChart, analysisChart;
+
+        // Initialiser les graphiques
+        function initCharts() {
+            // Graphique des catégories
+            const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+            categoryChart = new Chart(ctxCategory, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Points', 'Lignes', 'Polygones', 'Autres'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            'rgba(13, 110, 253, 0.7)',
+                            'rgba(25, 135, 84, 0.7)',
+                            'rgba(255, 193, 7, 0.7)',
+                            'rgba(108, 117, 125, 0.7)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Graphique des analyses
+            const ctxAnalysis = document.getElementById('analysisChart').getContext('2d');
+            analysisChart = new Chart(ctxAnalysis, {
+                type: 'bar',
+                data: {
+                    labels: ['Buffer', 'Intersection', 'Distance', 'Autres'],
+                    datasets: [{
+                        label: 'Nombre d\'analyses',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                        borderColor: 'rgba(13, 110, 253, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Charger les statistiques
+        async function loadStatistics() {
+            try {
+                // Statistiques spatiales
+                const spatialStats = await apiClient.getSpatialStatistics();
+                document.getElementById('stat-features').textContent = spatialStats.total_features || 0;
+                document.getElementById('stat-analyses').textContent = spatialStats.total_analyses || 0;
+
+                // Fichiers LIDAR
+                const lidarFiles = await apiClient.getLidarFiles();
+                document.getElementById('stat-lidar').textContent = lidarFiles.count || 0;
+                loadLidarStats(lidarFiles.files);
+
+                // Simulations
+                const simulations = await apiClient.getSimulations();
+                document.getElementById('stat-simulations').textContent = simulations.count || 0;
+
+                // Mettre à jour les graphiques
+                if (spatialStats.features_by_category) {
+                    updateCategoryChart(spatialStats.features_by_category);
+                }
+
+            } catch (error) {
+                console.error('Erreur chargement stats:', error);
+            }
+        }
+
+        // Mettre à jour le graphique des catégories
+        function updateCategoryChart(data) {
+            const labels = Object.keys(data);
+            const values = Object.values(data);
+            
+            categoryChart.data.labels = labels;
+            categoryChart.data.datasets[0].data = values;
+            categoryChart.update();
+        }
+
+        // Charger les stats LIDAR
+        function loadLidarStats(files) {
+            const tbody = document.querySelector('#lidar-stats-table tbody');
+            
+            if (!files || files.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucun fichier LIDAR</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            files.forEach(file => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${file.filename}</td>
+                    <td>${(file.point_count || 0).toLocaleString()}</td>
+                    <td>${(file.elevation_range?.min || 0).toFixed(2)} m</td>
+                    <td>${(file.elevation_range?.max || 0).toFixed(2)} m</td>
+                    <td>${new Date(file.uploaded_at).toLocaleDateString()}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Vérifier l'état du système
+        async function checkSystemStatus() {
+            try {
+                const health = await apiClient.healthCheck();
+                
+                // API Status
+                const apiStatus = document.getElementById('api-status');
+                apiStatus.innerHTML = '<i class="fas fa-circle me-1"></i>En ligne';
+                apiStatus.className = 'badge bg-success';
+
+                // Database Status
+                const dbStatus = document.getElementById('db-status');
+                if (health.database === 'connected') {
+                    dbStatus.innerHTML = '<i class="fas fa-circle me-1"></i>Connectée';
+                    dbStatus.className = 'badge bg-success';
+                } else {
+                    dbStatus.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Erreur';
+                    dbStatus.className = 'badge bg-danger';
+                }
+
+                // PostGIS Status
+                const postgisStatus = document.getElementById('postgis-status');
+                if (health.postgis === 'enabled') {
+                    postgisStatus.innerHTML = '<i class="fas fa-circle me-1"></i>Actif';
+                    postgisStatus.className = 'badge bg-success';
+                }
+
+                // Last update
+                document.getElementById('last-update').textContent = new Date().toLocaleString();
+
+            } catch (error) {
+                console.error('Erreur health check:', error);
+                document.getElementById('api-status').innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Hors ligne';
+                document.getElementById('api-status').className = 'badge bg-danger';
+            }
+        }
+
+        // Charger l'activité récente
+        function loadRecentActivity() {
+            const activityDiv = document.getElementById('recent-activity');
+            activityDiv.innerHTML = `
+                <div class="activity-item">
+                    <div class="d-flex justify-content-between">
+                        <span><i class="fas fa-plus-circle text-success me-2"></i>Nouvelle entité créée</span>
+                        <small class="text-muted">Il y a 5 min</small>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="d-flex justify-content-between">
+                        <span><i class="fas fa-upload text-info me-2"></i>Fichier LIDAR uploadé</span>
+                        <small class="text-muted">Il y a 15 min</small>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="d-flex justify-content-between">
+                        <span><i class="fas fa-chart-line text-primary me-2"></i>Analyse buffer effectuée</span>
+                        <small class="text-muted">Il y a 1 heure</small>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialisation
+        window.addEventListener('DOMContentLoaded', async () => {
+            initCharts();
+            await checkSystemStatus();
+            await loadStatistics();
+            loadRecentActivity();
+
+            // Rafraîchir toutes les 30 secondes
+            setInterval(checkSystemStatus, 30000);
+        });
+    </script>
+</body>
+</html>
